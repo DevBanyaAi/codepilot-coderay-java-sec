@@ -91,6 +91,9 @@ public class FileUpload {
         }
 
         String fileName = multifile.getOriginalFilename();
+        if (fileName != null && (fileName.contains("..") || fileName.contains("/") || fileName.contains("\\"))) {
+            return "Upload failed. Invalid filename.";
+        }
         String Suffix = fileName.substring(fileName.lastIndexOf(".")); // 获取文件后缀名
         String mimeType = multifile.getContentType(); // 获取MIME类型
         String filePath = UPLOADED_FOLDER + fileName;
