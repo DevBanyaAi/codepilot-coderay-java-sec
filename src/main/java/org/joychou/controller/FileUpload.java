@@ -59,11 +59,15 @@ public class FileUpload {
         try {
             // Get the file and save it somewhere
             byte[] bytes = file.getBytes();
-            Path path = Paths.get(UPLOADED_FOLDER + file.getOriginalFilename());
+            String originalFilename = file.getOriginalFilename();
+            if (originalFilename != null && (originalFilename.contains("..") || originalFilename.contains("/") || originalFilename.contains("\\"))) {
+                throw new IOException("Invalid filename");
+            }
+            Path path = Paths.get(UPLOADED_FOLDER + originalFilename);
             Files.write(path, bytes);
 
             redirectAttributes.addFlashAttribute("message",
-                    "You successfully uploaded '" + UPLOADED_FOLDER + file.getOriginalFilename() + "'");
+                    "You successfully uploaded '" + UPLOADED_FOLDER + originalFilename + "'");
 
         } catch (IOException e) {
             redirectAttributes.addFlashAttribute("message", "upload failed");
@@ -141,7 +145,11 @@ public class FileUpload {
         try {
             // Get the file and save it somewhere
             byte[] bytes = multifile.getBytes();
-            Path path = Paths.get(UPLOADED_FOLDER + multifile.getOriginalFilename());
+            String originalFilename = multifile.getOriginalFilename();
+            if (originalFilename != null && (originalFilename.contains("..") || originalFilename.contains("/") || originalFilename.contains("\\"))) {
+                throw new IOException("Invalid filename");
+            }
+            Path path = Paths.get(UPLOADED_FOLDER + originalFilename);
             Files.write(path, bytes);
         } catch (IOException e) {
             logger.error(e.toString());
@@ -155,6 +163,10 @@ public class FileUpload {
     }
 
     private void deleteFile(String filePath) {
+        if (filePath != null && (filePath.contains(".."))) {
+            logger.info("Invalid file path for deletion!");
+            return;
+        }
         File delFile = new File(filePath);
         if(delFile.isFile() && delFile.exists()) {
             if (delFile.delete()) {
@@ -173,6 +185,9 @@ public class FileUpload {
      */
     private File convert(MultipartFile multiFile) throws Exception {
         String fileName = multiFile.getOriginalFilename();
+        if (fileName != null && (fileName.contains("..") || fileName.contains("/") || fileName.contains("\\"))) {
+            throw new IOException("Invalid filename");
+        }
         String suffix = fileName.substring(fileName.lastIndexOf("."));
         UUID uuid = Generators.timeBasedGenerator().generate();
         randomFilePath = UPLOADED_FOLDER + uuid + suffix;

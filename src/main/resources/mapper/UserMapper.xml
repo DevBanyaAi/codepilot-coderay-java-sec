@@ -14,13 +14,17 @@
     <!--</select>-->
 
     <select id="findByUserNameVuln02" parameterType="String" resultMap="User">
-        select * from users where username like '%${_parameter}%'
+        select * from users where username like CONCAT('%', #{_parameter}, '%')
     </select>
 
     <select id="findByUserNameVuln03" parameterType="String" resultMap="User">
         select * from users
         <if test="order != null">
-            order by ${order} asc
+            <choose>
+                <when test="order == 'id'">order by id asc</when>
+                <when test="order == 'username'">order by username asc</when>
+                <otherwise>order by id asc</otherwise>
+            </choose>
         </if>
     </select>
 
