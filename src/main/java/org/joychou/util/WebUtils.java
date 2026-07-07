@@ -34,6 +34,9 @@ public class WebUtils {
 
     public static String getFileExtension(String fullName) {
         Preconditions.checkNotNull(fullName);
+        if (fullName.contains("..") || fullName.contains("/") || fullName.contains("\\")) {
+            throw new IllegalArgumentException("Invalid file path");
+        }
         String fileName = (new File(fullName)).getName();
         int dotIndex = fileName.lastIndexOf('.');
         return dotIndex == -1 ? "" : fileName.substring(dotIndex + 1);
@@ -42,6 +45,9 @@ public class WebUtils {
 
     public static String getNameWithoutExtension(String file) {
         Preconditions.checkNotNull(file);
+        if (file.contains("..") || file.contains("/") || file.contains("\\")) {
+            throw new IllegalArgumentException("Invalid file path");
+        }
         String fileName = (new File(file)).getName();
         int dotIndex = fileName.lastIndexOf('.');
         return dotIndex == -1 ? fileName : fileName.substring(0, dotIndex);
